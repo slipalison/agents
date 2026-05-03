@@ -103,6 +103,7 @@ Pular o `code-validator` e rodar o `gsd-code-reviewer` diretamente é proibido e
 - **Use AskUserQuestion** para decisões irreversíveis (deletar arquivos, mudar contratos públicos, alterar schema de DB).
 - **Nunca pule o validator**, mesmo em "tasks pequenas".
 - **Detecte loops**: se o validator falhar 3 vezes seguidas na mesma task, pause e escale para o usuário.
+- **Nunca escreva código você mesmo** — se o `gsd-executor` ou qualquer outro agente genérico estiver escrevendo código de produção, interrompa e redirecione para `@csharp-developer` ou `@frontend-developer`. O tech-lead orquestra; os specialists implementam.
 
 ## Tom e formato
 

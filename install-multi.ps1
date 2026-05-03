@@ -319,27 +319,59 @@ function Install-Antigravity {
 # ── Dependencies: GSD + Caveman ───────────────────────────────────────────────
 
 function Install-Dependencies {
-    Write-Host ""
-    Write-Host -NoNewline "  Instalar GSD + Caveman agora? [Y/n]: "
-    $answer = Read-Host
-    if ($answer -match '^[Nn]') { return }
+    # Detecta instalação em todos os destinos suportados
+    $opencodeSkills = if ($env:OPENCODE_CONFIG_DIR) { "$env:OPENCODE_CONFIG_DIR\skills" } `
+                      else { "$env:USERPROFILE\.config\opencode\skills" }
+    $claudeSkills   = if ($env:CLAUDE_CONFIG_DIR) { "$env:CLAUDE_CONFIG_DIR\skills" } `
+                      else { "$env:USERPROFILE\.claude\skills" }
 
-    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
-        Write-Host "  ⚠  npx não encontrado — instale Node.js e rode manualmente:" -ForegroundColor Yellow
-        Write-Host "    npx get-shit-done-cc@latest"
-        Write-Host "    npx skills add JuliusBrussee/caveman"
+    $GsdInstalled     = $false
+    $CavemanInstalled = $false
+
+    foreach ($skillsDir in @($opencodeSkills, $claudeSkills)) {
+        if (Test-Path $skillsDir) {
+            if (Get-ChildItem $skillsDir -Directory -ErrorAction SilentlyContinue |
+                    Where-Object { $_.Name -like "gsd*" } | Select-Object -First 1) {
+                $GsdInstalled = $true
+            }
+            if (Test-Path "$skillsDir\caveman") { $CavemanInstalled = $true }
+        }
+    }
+
+    if ($GsdInstalled -and $CavemanInstalled) {
+        Write-Host "  GSD e Caveman já instalados — pulando."
         return
     }
 
-    Write-Host ""
-    Write-Host "▶ GSD (Get Shit Done)" -ForegroundColor Blue
-    try { & npx get-shit-done-cc@latest }
-    catch { Write-Host "  ⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest" -ForegroundColor Yellow }
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        Write-Host "  ⚠  npx não encontrado — instale Node.js e rode manualmente:" -ForegroundColor Yellow
+        if (-not $GsdInstalled)     { Write-Host "    npx get-shit-done-cc@latest" }
+        if (-not $CavemanInstalled) { Write-Host "    npx skills add JuliusBrussee/caveman" }
+        return
+    }
+
+    $parts = @()
+    if (-not $GsdInstalled)     { $parts += "GSD" }
+    if (-not $CavemanInstalled) { $parts += "Caveman" }
 
     Write-Host ""
-    Write-Host "▶ Caveman" -ForegroundColor Blue
-    try { & npx skills add JuliusBrussee/caveman }
-    catch { Write-Host "  ⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman" -ForegroundColor Yellow }
+    Write-Host -NoNewline "  Instalar $($parts -join ' + ') agora? [Y/n]: "
+    $answer = Read-Host
+    if ($answer -match '^[Nn]') { return }
+
+    if (-not $GsdInstalled) {
+        Write-Host ""
+        Write-Host "▶ GSD (Get Shit Done)" -ForegroundColor Blue
+        try { & npx get-shit-done-cc@latest }
+        catch { Write-Host "  ⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest" -ForegroundColor Yellow }
+    }
+
+    if (-not $CavemanInstalled) {
+        Write-Host ""
+        Write-Host "▶ Caveman" -ForegroundColor Blue
+        try { & npx skills add JuliusBrussee/caveman }
+        catch { Write-Host "  ⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman" -ForegroundColor Yellow }
+    }
 }
 
 # ── Main ───────────────────────────────────────────────────────────────────────

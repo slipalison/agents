@@ -282,25 +282,52 @@ install_antigravity() {
 # ── Dependencies: GSD + Caveman ───────────────────────────────────────────────
 
 install_deps() {
-  echo ""
-  echo -n "  Instalar GSD + Caveman agora? [Y/n]: "
-  read -r answer
-  [[ "$answer" =~ ^[Nn] ]] && return
+  # Detecta instalação em todos os destinos suportados
+  local opencode_skills="${OPENCODE_CONFIG_DIR:-$HOME/.config/opencode}/skills"
+  local claude_skills="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
 
-  if ! command -v npx &>/dev/null; then
-    echo -e "  ${YELLOW}⚠  npx não encontrado — instale Node.js e rode manualmente:${NC}"
-    echo "    npx get-shit-done-cc@latest"
-    echo "    npx skills add JuliusBrussee/caveman"
+  local GSD_INSTALLED=false
+  local CAVEMAN_INSTALLED=false
+
+  for skills_dir in "$opencode_skills" "$claude_skills"; do
+    ls "$skills_dir/" 2>/dev/null | grep -q "^gsd" && GSD_INSTALLED=true
+    [[ -d "$skills_dir/caveman" ]] && CAVEMAN_INSTALLED=true
+  done
+
+  if $GSD_INSTALLED && $CAVEMAN_INSTALLED; then
+    echo "  GSD e Caveman já instalados — pulando."
     return
   fi
 
-  echo ""
-  echo -e "${BLUE}▶ GSD (Get Shit Done)${NC}"
-  npx get-shit-done-cc@latest || echo -e "  ${YELLOW}⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest${NC}"
+  if ! command -v npx &>/dev/null; then
+    echo -e "  ${YELLOW}⚠  npx não encontrado — instale Node.js e rode manualmente:${NC}"
+    $GSD_INSTALLED     || echo "    npx get-shit-done-cc@latest"
+    $CAVEMAN_INSTALLED || echo "    npx skills add JuliusBrussee/caveman"
+    return
+  fi
+
+  local parts=()
+  $GSD_INSTALLED     || parts+=("GSD")
+  $CAVEMAN_INSTALLED || parts+=("Caveman")
+  local label
+  label=$(IFS=" + "; echo "${parts[*]}")
 
   echo ""
-  echo -e "${BLUE}▶ Caveman${NC}"
-  npx skills add JuliusBrussee/caveman || echo -e "  ${YELLOW}⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman${NC}"
+  echo -n "  Instalar ${label} agora? [Y/n]: "
+  read -r answer
+  [[ "$answer" =~ ^[Nn] ]] && return
+
+  if ! $GSD_INSTALLED; then
+    echo ""
+    echo -e "${BLUE}▶ GSD (Get Shit Done)${NC}"
+    npx get-shit-done-cc@latest || echo -e "  ${YELLOW}⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest${NC}"
+  fi
+
+  if ! $CAVEMAN_INSTALLED; then
+    echo ""
+    echo -e "${BLUE}▶ Caveman${NC}"
+    npx skills add JuliusBrussee/caveman || echo -e "  ${YELLOW}⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman${NC}"
+  fi
 }
 
 # ── Main ───────────────────────────────────────────────────────────────────────

@@ -37,21 +37,35 @@ Write-Host "  1. Verifique os agentes:    opencode agent list"
 Write-Host "  2. Inicie uma sessão:       cd C:\seu-projeto; opencode"
 Write-Host "  3. Use Tab até o agente primário ser 'tech-lead'"
 Write-Host ""
-Write-Host -NoNewline "Instalar GSD + Caveman agora? [Y/n]: "
-$answer = Read-Host
-if ($answer -notmatch '^[Nn]') {
-    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
-        Write-Host "⚠  npx não encontrado — instale Node.js e rode manualmente:"
-        Write-Host "  npx get-shit-done-cc@latest"
-        Write-Host "  npx skills add JuliusBrussee/caveman"
-    } else {
-        Write-Host ""
-        Write-Host "==> GSD (Get Shit Done)"
-        try { & npx get-shit-done-cc@latest }
-        catch { Write-Host "⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest" }
-        Write-Host ""
-        Write-Host "==> Caveman"
-        try { & npx skills add JuliusBrussee/caveman }
-        catch { Write-Host "⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman" }
+
+# Detecta se GSD e Caveman já estão instalados
+$GsdInstalled     = (Test-Path "$Dest\skills") -and (Get-ChildItem "$Dest\skills" -Directory | Where-Object { $_.Name -like "gsd*" } | Select-Object -First 1)
+$CavemanInstalled = Test-Path "$Dest\skills\caveman"
+
+if ($GsdInstalled -and $CavemanInstalled) {
+    Write-Host "==> GSD e Caveman já instalados — pulando."
+} elseif (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+    Write-Host "⚠  npx não encontrado — instale Node.js e rode manualmente:"
+    if (-not $GsdInstalled)     { Write-Host "  npx get-shit-done-cc@latest" }
+    if (-not $CavemanInstalled) { Write-Host "  npx skills add JuliusBrussee/caveman" }
+} else {
+    $parts = @()
+    if (-not $GsdInstalled)     { $parts += "GSD" }
+    if (-not $CavemanInstalled) { $parts += "Caveman" }
+    Write-Host -NoNewline "Instalar $($parts -join ' + ') agora? [Y/n]: "
+    $answer = Read-Host
+    if ($answer -notmatch '^[Nn]') {
+        if (-not $GsdInstalled) {
+            Write-Host ""
+            Write-Host "==> GSD (Get Shit Done)"
+            try { & npx get-shit-done-cc@latest }
+            catch { Write-Host "⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest" }
+        }
+        if (-not $CavemanInstalled) {
+            Write-Host ""
+            Write-Host "==> Caveman"
+            try { & npx skills add JuliusBrussee/caveman }
+            catch { Write-Host "⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman" }
+        }
     }
 }

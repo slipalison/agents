@@ -36,19 +36,42 @@ echo "  1. Verifique os agentes:    opencode agent list"
 echo "  2. Inicie uma sessão:       cd ~/seu-projeto && opencode"
 echo "  3. Use Tab até o agente primário ser 'tech-lead'"
 echo ""
-echo -n "Instalar GSD + Caveman agora? [Y/n]: "
-read -r answer
-if [[ ! "$answer" =~ ^[Nn] ]]; then
+
+# Detecta se GSD e Caveman já estão instalados
+GSD_INSTALLED=false
+CAVEMAN_INSTALLED=false
+
+if ls "$DEST/skills/" 2>/dev/null | grep -q "^gsd"; then
+  GSD_INSTALLED=true
+fi
+if [[ -d "$DEST/skills/caveman" ]]; then
+  CAVEMAN_INSTALLED=true
+fi
+
+if $GSD_INSTALLED && $CAVEMAN_INSTALLED; then
+  echo "==> GSD e Caveman já instalados — pulando."
+else
   if ! command -v npx &>/dev/null; then
     echo "⚠  npx não encontrado — instale Node.js e rode manualmente:"
-    echo "  npx get-shit-done-cc@latest"
-    echo "  npx skills add JuliusBrussee/caveman"
+    $GSD_INSTALLED     || echo "  npx get-shit-done-cc@latest"
+    $CAVEMAN_INSTALLED || echo "  npx skills add JuliusBrussee/caveman"
   else
-    echo ""
-    echo "==> GSD (Get Shit Done)"
-    npx get-shit-done-cc@latest || echo "⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest"
-    echo ""
-    echo "==> Caveman"
-    npx skills add JuliusBrussee/caveman || echo "⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman"
+    PROMPT="Instalar"
+    $GSD_INSTALLED     || PROMPT="$PROMPT GSD"
+    $CAVEMAN_INSTALLED || { $GSD_INSTALLED && PROMPT="$PROMPT +"; PROMPT="$PROMPT Caveman"; }
+    echo -n "$PROMPT agora? [Y/n]: "
+    read -r answer
+    if [[ ! "$answer" =~ ^[Nn] ]]; then
+      if ! $GSD_INSTALLED; then
+        echo ""
+        echo "==> GSD (Get Shit Done)"
+        npx get-shit-done-cc@latest || echo "⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest"
+      fi
+      if ! $CAVEMAN_INSTALLED; then
+        echo ""
+        echo "==> Caveman"
+        npx skills add JuliusBrussee/caveman || echo "⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman"
+      fi
+    fi
   fi
 fi

@@ -72,6 +72,25 @@ Quando dentro de um workflow GSD ativo:
 - Cada task deve fechar com um commit atômico
 - O `code-validator` é OBRIGATÓRIO antes de fechar qualquer task
 
+## Delegação obrigatória de implementação
+
+**NENHUM agente orquestrador** (incluindo `gsd-executor`, `tech-lead`, ou qualquer outro) deve escrever código de produção diretamente. Todo código deve ser produzido pelos specialists locais deste projeto.
+
+Tabela de delegação — sem exceção:
+
+| Tipo de task | Agent responsável |
+|---|---|
+| Backend C# / .NET / ASP.NET / EF Core | `@csharp-developer` |
+| Frontend React / TypeScript / Tailwind | `@frontend-developer` |
+| Validação pós-implementação | `@code-validator` |
+
+### Regras
+
+1. O `gsd-executor` **não escreve código** — ele lê o `PLAN.md`, identifica o tipo de task, e despacha para o specialist correto.
+2. O `tech-lead` **não escreve código** — idem.
+3. Se uma task for full-stack, divida em duas: backend primeiro (`@csharp-developer`), depois frontend (`@frontend-developer`).
+4. Qualquer agente que receber uma task de código fora de seu escopo deve **recusar e escalar para o tech-lead**.
+
 ## Ordem obrigatória de review de código
 
 **NUNCA** execute `gsd-code-reviewer` sem antes executar o `code-validator`.
