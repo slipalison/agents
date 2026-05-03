@@ -72,6 +72,17 @@ Quando dentro de um workflow GSD ativo:
 - Cada task deve fechar com um commit atômico
 - O `code-validator` é OBRIGATÓRIO antes de fechar qualquer task
 
+## Ordem obrigatória de review de código
+
+**NUNCA** execute `gsd-code-reviewer` sem antes executar o `code-validator`.
+
+A sequência correta é SEMPRE:
+
+1. `code-validator` — valida compilação, testes, lint e cobertura
+2. `gsd-code-reviewer` — só pode rodar se o `code-validator` passou sem erros bloqueantes
+
+Usar `gsd-code-reviewer` diretamente (pulando o `code-validator`) é proibido e invalida o review.
+
 ## Idioma
 
 - **Código, comentários técnicos, commits**: inglês

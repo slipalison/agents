@@ -316,6 +316,32 @@ function Install-Antigravity {
     Write-Host "  ⚠  Revise $dest\agents.yaml e ajuste o schema se necessário" -ForegroundColor Yellow
 }
 
+# ── Dependencies: GSD + Caveman ───────────────────────────────────────────────
+
+function Install-Dependencies {
+    Write-Host ""
+    Write-Host -NoNewline "  Instalar GSD + Caveman agora? [Y/n]: "
+    $answer = Read-Host
+    if ($answer -match '^[Nn]') { return }
+
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        Write-Host "  ⚠  npx não encontrado — instale Node.js e rode manualmente:" -ForegroundColor Yellow
+        Write-Host "    npx get-shit-done-cc@latest"
+        Write-Host "    npx skills add JuliusBrussee/caveman"
+        return
+    }
+
+    Write-Host ""
+    Write-Host "▶ GSD (Get Shit Done)" -ForegroundColor Blue
+    try { & npx get-shit-done-cc@latest }
+    catch { Write-Host "  ⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest" -ForegroundColor Yellow }
+
+    Write-Host ""
+    Write-Host "▶ Caveman" -ForegroundColor Blue
+    try { & npx skills add JuliusBrussee/caveman }
+    catch { Write-Host "  ⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman" -ForegroundColor Yellow }
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 $raw = if ($Targets) { $Targets } else { Show-Menu }
@@ -342,3 +368,5 @@ Write-Host ""
 Write-Host "╔════════════════════════════════╗" -ForegroundColor Green
 Write-Host "║   Instalação concluída ✓       ║" -ForegroundColor Green
 Write-Host "╚════════════════════════════════╝" -ForegroundColor Green
+
+Install-Dependencies

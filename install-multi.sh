@@ -279,6 +279,30 @@ install_antigravity() {
   echo -e "  ${YELLOW}⚠  Revise ${dest}/agents.yaml e ajuste o schema se necessário${NC}"
 }
 
+# ── Dependencies: GSD + Caveman ───────────────────────────────────────────────
+
+install_deps() {
+  echo ""
+  echo -n "  Instalar GSD + Caveman agora? [Y/n]: "
+  read -r answer
+  [[ "$answer" =~ ^[Nn] ]] && return
+
+  if ! command -v npx &>/dev/null; then
+    echo -e "  ${YELLOW}⚠  npx não encontrado — instale Node.js e rode manualmente:${NC}"
+    echo "    npx get-shit-done-cc@latest"
+    echo "    npx skills add JuliusBrussee/caveman"
+    return
+  fi
+
+  echo ""
+  echo -e "${BLUE}▶ GSD (Get Shit Done)${NC}"
+  npx get-shit-done-cc@latest || echo -e "  ${YELLOW}⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest${NC}"
+
+  echo ""
+  echo -e "${BLUE}▶ Caveman${NC}"
+  npx skills add JuliusBrussee/caveman || echo -e "  ${YELLOW}⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman${NC}"
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 main() {
@@ -308,6 +332,8 @@ main() {
   echo -e "${GREEN}╔════════════════════════════════╗${NC}"
   echo -e "${GREEN}║   Instalação concluída ✓       ║${NC}"
   echo -e "${GREEN}╚════════════════════════════════╝${NC}"
+
+  install_deps
 }
 
 main

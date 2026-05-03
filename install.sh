@@ -36,6 +36,19 @@ echo "  1. Verifique os agentes:    opencode agent list"
 echo "  2. Inicie uma sessão:       cd ~/seu-projeto && opencode"
 echo "  3. Use Tab até o agente primário ser 'tech-lead'"
 echo ""
-echo "Não esqueça de instalar GSD e Caveman se ainda não fez:"
-echo "  npx get-shit-done-cc --opencode --global --minimal"
-echo "  npx skills add JuliusBrussee/caveman -a opencode"
+echo -n "Instalar GSD + Caveman agora? [Y/n]: "
+read -r answer
+if [[ ! "$answer" =~ ^[Nn] ]]; then
+  if ! command -v npx &>/dev/null; then
+    echo "⚠  npx não encontrado — instale Node.js e rode manualmente:"
+    echo "  npx get-shit-done-cc@latest"
+    echo "  npx skills add JuliusBrussee/caveman"
+  else
+    echo ""
+    echo "==> GSD (Get Shit Done)"
+    npx get-shit-done-cc@latest || echo "⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest"
+    echo ""
+    echo "==> Caveman"
+    npx skills add JuliusBrussee/caveman || echo "⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman"
+  fi
+fi

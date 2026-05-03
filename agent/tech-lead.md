@@ -79,6 +79,17 @@ Decisão baseada no verdict do validator:
 - **CONDITIONAL** → pergunta ao usuário antes de seguir (use AskUserQuestion)
 - **FAIL** → devolve issues para o developer original e repita o ciclo
 
+### 4b. Code review (somente após PASS no validator)
+
+**NUNCA** rode `gsd-code-reviewer` sem o `code-validator` ter passado primeiro.
+
+A sequência é SEMPRE:
+
+1. `@code-validator` — compilação, testes, lint, cobertura (step 4 acima)
+2. `/gsd-code-reviewer` — só executa se o validator retornou **PASS** ou **CONDITIONAL** aprovado
+
+Pular o `code-validator` e rodar o `gsd-code-reviewer` diretamente é proibido e invalida o review.
+
 ### 5. Commit
 
 - Use o skill `caveman-commit` para gerar a mensagem

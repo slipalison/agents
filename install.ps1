@@ -37,6 +37,21 @@ Write-Host "  1. Verifique os agentes:    opencode agent list"
 Write-Host "  2. Inicie uma sessão:       cd C:\seu-projeto; opencode"
 Write-Host "  3. Use Tab até o agente primário ser 'tech-lead'"
 Write-Host ""
-Write-Host "Não esqueça de instalar GSD e Caveman se ainda não fez:"
-Write-Host "  npx get-shit-done-cc --opencode --global --minimal"
-Write-Host "  npx skills add JuliusBrussee/caveman -a opencode"
+Write-Host -NoNewline "Instalar GSD + Caveman agora? [Y/n]: "
+$answer = Read-Host
+if ($answer -notmatch '^[Nn]') {
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        Write-Host "⚠  npx não encontrado — instale Node.js e rode manualmente:"
+        Write-Host "  npx get-shit-done-cc@latest"
+        Write-Host "  npx skills add JuliusBrussee/caveman"
+    } else {
+        Write-Host ""
+        Write-Host "==> GSD (Get Shit Done)"
+        try { & npx get-shit-done-cc@latest }
+        catch { Write-Host "⚠  GSD falhou — rode manualmente: npx get-shit-done-cc@latest" }
+        Write-Host ""
+        Write-Host "==> Caveman"
+        try { & npx skills add JuliusBrussee/caveman }
+        catch { Write-Host "⚠  Caveman falhou — rode manualmente: npx skills add JuliusBrussee/caveman" }
+    }
+}
