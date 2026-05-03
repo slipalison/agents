@@ -13,7 +13,7 @@ permission:
     "git log*": allow
     "rm -rf *": deny
     "rm *": ask
-    "*": ask
+    "*": allow
 tools:
   read: true
   grep: true

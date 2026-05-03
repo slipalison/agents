@@ -6,9 +6,8 @@ permission:
   edit: allow
   write: allow
   bash:
-    "git *": allow
     "rm -rf *": deny
-    "*": ask
+    "*": allow
 tools:
   read: true
   write: true
